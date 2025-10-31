@@ -7,9 +7,33 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(
+ *     name="Auth",
+ *     description="Endpoints de autenticación"
+ * )
+ */
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     tags={"Auth"},
+     *     summary="Login de usuario",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Login exitoso"),
+     *     @OA\Response(response=422, description="Datos inválidos")
+     * )
+     */
     public function login(Request $request) {
         $fields = $request->validate([
             'email' => 'required|string|email',
@@ -32,6 +56,25 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     tags={"Auth"},
+     *     summary="Registrar nuevo usuario",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Usuario creado exitosamente"),
+     *     @OA\Response(response=422, description="Datos inválidos")
+     * )
+     */
     public function register(Request $request)
     {
         $fields = $request->validate([
@@ -56,7 +99,23 @@ class AuthController extends Controller
         ], 201);
     }
 
-
+    /**
+     * @OA\Post(
+     * path="/api/logout",
+     * tags={"Auth"},
+     * summary="Cerrar sesión (logout)",
+     * description="Invalida el token de autenticación del usuario.",
+     * security={{"bearerAuth": {}}},
+     * @OA\Response(
+     * response=200,
+     * description="Sesión cerrada correctamente"
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="No autenticado (token inválido o no proporcionado)"
+     * )
+     * )
+     */
     public function logout(Request $request){
         $request->user()->tokens()->delete();
 
