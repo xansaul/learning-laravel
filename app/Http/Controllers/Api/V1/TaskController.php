@@ -7,7 +7,7 @@ use App\Models\Task;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Resources\TaskResource;
-use OpenApi\Annotations as OA; // <-- Importante
+use OpenApi\Annotations as OA;
 
 /**
  * @OA\Tag(
